@@ -1,5 +1,47 @@
+import copy
+
 import numpy
 import numpy as np
+
+
+def GetMat(A):
+    """
+    Input:
+    A = adjacency matrix of a graph
+
+    Output:
+    P = transition probabilities matrix
+    din = vector containing the indegrees
+    dout = vector containing the outdegrees
+    """
+    n = len(A)
+    dout = np.ones(n)
+    din = np.ones(n)
+    P = A
+
+    for i in range(n):
+        dout[i] = np.sum(A[i])
+        din[i] = np.sum(A[:, i])
+        if dout[i] != 0: P[i] = A[i] / dout[i]
+        else: P[i] = A[i]
+
+    return P, din, dout
+
+def GoogleMat(P, alpha, v):
+    """
+    Input:
+    P = transition probabilities matrix
+    alpha = coeff to build the Google matrix
+
+    Output:
+    G = Google matrix built from P and alpha
+    """
+    n = len(P)
+
+    E = np.ones(n) * np.transpose(v)
+
+    G = alpha * P + (1 - alpha) * (E / n)
+    return G
 
 def pageRankLinear(A, alpha, v):
     """
@@ -15,28 +57,35 @@ def pageRankLinear(A, alpha, v):
     """
 
     n = len(A)
-    I = np.identity(n)
-    dout = np.ones(n)
-    din = np.ones(n)
-    P = A
+    P, din, dout = GetMat(A)
+    G = GoogleMat(P, alpha, v)
 
-    for i in range(n):
-        dout[i] = np.sum(A[i])
-        din[i] = np.sum(A[:, i])
-        P[i] = A[i] / dout[i]
+    # I = np.identity(n)
+    #
+    # Pfinal = numpy.delete(
+    #     np.append([np.ones(n)], I - np.transpose(P), axis=0),
+    #     n, 0)
+    #
+    # vect = np.ones(n)
+    # vect[1:n] = 0
 
-    Pfinal = numpy.delete(
-        np.append([np.ones(n)], I-np.transpose(P), axis=0),
-        n, 0)
+    """
+    This function must return the left eigen vector of G associatied with the only eigen value equal to 1.0
+    """
 
-    vect = np.ones(n)
-    vect[1:n] = 0
-
-    return np.linalg.solve(Pfinal, vect)
+    return "Some work has to be done."
 
 def error(a, b):
+    """
+    Input:
+    a = vector
+    b = vector
+
+    Output:
+    Max = the maximum error between a[i] and b[i]
+    """
     Max = 0
-    if (len(a) != len(b)): raise IndexError('a and b must be equally sized')
+    if len(a) != len(b): raise IndexError('a and b must be equally sized')
     for i in range(len(a)):
         Max = max(abs(a[i] - b[i]), Max)
     return Max
@@ -52,36 +101,16 @@ def pageRankPower(A, alpha, v):
     d’importance des noeuds ordonnés dans
     le même ordre que la matrice d’adjacence.
     """
-
     n = len(A)
-    I = np.identity(n)
-    dout = np.ones(n)
-    din = np.ones(n)
-    P = A
-    eps = 10**-8
+    P, din, dout = GetMat(A)
 
-    for i in range(n):
-        dout[i] = np.sum(A[i])
-        din[i] = np.sum(A[:, i])
-        P[i] = A[i] / dout[i]
+    G = GoogleMat(P, alpha, v)
+    Gt = np.transpose(G)
+    dprev = np.ones(n) * np.inf
 
-    Pt = np.transpose(P)
-    dprev = np.ones(n)*np.inf
-
-    it = 0
-
+    eps = 10 ** -9
     while error(dprev, din) > eps:
         dprev = din
-        din = np.dot(Pt, din)
-        it += 1
+        din = np.dot(Gt, din)
 
-    print(it)
-    return din/np.sum(din)
-
-
-
-print(pageRankPower(np.array([
-    [0.0, 2.0, 0.0],
-    [0.0, 0.0, 2.0],
-    [1.0, 1.0, 0.0]
-]), 1.0, 1.0))
+    return din / np.sum(din)
