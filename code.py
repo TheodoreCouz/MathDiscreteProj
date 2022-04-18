@@ -1,8 +1,4 @@
-import copy
-
-import numpy
 import numpy as np
-
 
 def GetMat(A):
     """
@@ -37,9 +33,7 @@ def GoogleMat(P, alpha, v):
     G = Google matrix built from P and alpha
     """
     n = len(P)
-
     E = np.ones(n) * np.transpose(v)
-
     G = alpha * P + (1 - alpha) * (E / n)
     return G
 
@@ -65,7 +59,6 @@ def pageRankLinear(A, alpha, v):
     # Pfinal = numpy.delete(
     #     np.append([np.ones(n)], I - np.transpose(P), axis=0),
     #     n, 0)
-    #
     # vect = np.ones(n)
     # vect[1:n] = 0
 
