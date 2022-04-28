@@ -21,7 +21,12 @@ def GetMat(A):
         if dout[i] != 0: P[i] = A[i] / dout[i]
         else: P[i] = A[i]
 
-    return P, din, dout
+    return P
+
+print(GetMat(np.array([
+    [1.0, 2.0],
+    [3.0, 4.0]
+]))[0])
 
 def GoogleMat(P, alpha, v):
     """
@@ -34,7 +39,7 @@ def GoogleMat(P, alpha, v):
     """
     n = len(P)
     E = np.ones(n) * np.transpose(v)
-    G = alpha * P + (1 - alpha) * (E / n)
+    G = alpha * P + (1 - alpha) * (E)
     return G
 
 def pageRankLinear(A, alpha, v):
@@ -50,23 +55,13 @@ def pageRankLinear(A, alpha, v):
     le même ordre que la matrice d’adjacence.
     """
 
+    P, din ,dout = GetMat(A)
     n = len(A)
-    P, din, dout = GetMat(A)
-    G = GoogleMat(P, alpha, v)
-
-    # I = np.identity(n)
-    #
-    # Pfinal = numpy.delete(
-    #     np.append([np.ones(n)], I - np.transpose(P), axis=0),
-    #     n, 0)
-    # vect = np.ones(n)
-    # vect[1:n] = 0
-
-    """
-    This function must return the left eigen vector of G associatied with the only eigen value equal to 1.0
-    """
-
-    return "Some work has to be done."
+    I = np.identity(n)
+    alphaP = alpha * P
+    firstSide = np.transpose(I - alphaP)
+    secondSide = (1 - alpha) * v
+    return np.linalg.solve(firstSide, secondSide)
 
 def error(a, b):
     """
@@ -95,15 +90,16 @@ def pageRankPower(A, alpha, v):
     le même ordre que la matrice d’adjacence.
     """
     n = len(A)
-    P, din, dout = GetMat(A)
-
-    G = GoogleMat(P, alpha, v)
-    Gt = np.transpose(G)
-    dprev = np.ones(n) * np.inf
+    P = GetMat(A)
+    x = v
+    G = GoogleMat(P, alpha, v) # google mat is correct
+    Gt = G.transpose()
+    prev = np.ones(n) * np.inf
 
     eps = 10 ** -9
-    while error(dprev, din) > eps:
-        dprev = din
-        din = np.dot(Gt, din)
+    while True:
+        prev = x
+        x = np.dot(Gt, x)
+        print(x)
 
-    return din / np.sum(din)
+    return x #Normalize
