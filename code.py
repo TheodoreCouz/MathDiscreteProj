@@ -1,4 +1,7 @@
+from statistics import pvariance
 import numpy as np
+
+
 
 def GetMat(A):
     """
@@ -17,16 +20,11 @@ def GetMat(A):
 
     for i in range(n):
         dout[i] = np.sum(A[i])
-        din[i] = np.sum(A[:, i])
+        din[i] = np.sum(A[:,i])
         if dout[i] != 0: P[i] = A[i] / dout[i]
         else: P[i] = A[i]
 
     return P
-
-print(GetMat(np.array([
-    [1.0, 2.0],
-    [3.0, 4.0]
-]))[0])
 
 def GoogleMat(P, alpha, v):
     """
@@ -55,7 +53,9 @@ def pageRankLinear(A, alpha, v):
     le même ordre que la matrice d’adjacence.
     """
 
-    P, din ,dout = GetMat(A)
+    # A is the adjacency matrix
+
+    P = GetMat(A) # <matrice de probabilités de transisition>
     n = len(A)
     I = np.identity(n)
     alphaP = alpha * P
@@ -89,17 +89,69 @@ def pageRankPower(A, alpha, v):
     d’importance des noeuds ordonnés dans
     le même ordre que la matrice d’adjacence.
     """
+    # A is the adjacency matrix
+
     n = len(A)
-    P = GetMat(A)
+    P = GetMat(A) # <matrice de probabilités de transisition>
     x = v
-    G = GoogleMat(P, alpha, v) # google mat is correct
+    G = GoogleMat(P, alpha, v) # <Google matrix>
     Gt = G.transpose()
     prev = np.ones(n) * np.inf
 
     eps = 10 ** -9
-    while True:
+    # this condition will be false when the result will have converged
+    # According to the instructions, we must write the 3 first iterations only
+    # The condition must be changed for the report
+    while error(x, prev) > eps: 
         prev = x
         x = np.dot(Gt, x)
-        print(x)
 
     return x #Normalize
+
+"""
+@param:
+mPath: path to the file containing the adjacency matrix of the graph we're working on
+vPath: path to the file containing the personalization vector we must use to compute the pagerank
+
+@result:
+AdjMat: adjacency matrix translated in order to be usable in python
+pVect: personalization vector translated in order to be usable in python
+"""
+def readFiles(mPath, vPath):
+    AdjMat= []
+    with open(mPath, 'r') as file:  # reads adjacency matrix
+        for line in file.read().split("\n"):
+            if len(line) <= 10: break
+            AdjMat.append([])
+            for elem in line.strip().split(","):
+                AdjMat[-1].append(float(elem))
+        file.close()
+
+    pVect = []
+    with open(vPath, 'r') as file: # reads perso vector
+        for line in file.read().split("\n"):
+            if len(line) <= 10: break
+            for elem in line.strip().split(","):
+                pVect.append(float(elem))
+        file.close()
+
+    return np.array(AdjMat), np.array(pVect)
+
+def main(): # main function 
+
+    AdjMat, pVect = readFiles("adjacencyMat.csv", "vectorPerso.csv")
+    alpha = 0.9 # default value given in the instructions
+
+    Linear = pageRankLinear(AdjMat, alpha, pVect)
+    print(f"Result from Linear Method:\n{Linear}")
+
+    Power = pageRankPower(AdjMat, alpha, pVect)
+    print(f"Result from Power Method:\n{Power}")
+
+    # Notice that the two functions must return the same pageRankVector
+    # If not, there is a problem somewhere
+
+
+#-------Executed Instructions-------#
+
+main()

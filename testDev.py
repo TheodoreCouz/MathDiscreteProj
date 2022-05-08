@@ -24,18 +24,18 @@ import numpy as np
 # ]), 0.9, 1.0))
 #
 
-print(code.pageRankPower(np.array([
-    [0.0, 0.0, 0.0],
-    [1.0, 0.0, 0.0],
-    [1.0, 2.0, 0.0]
-]), 0.9, np.array([1/3, 1/3, 1/3])))
+# print(code.pageRankPower(np.array([
+#     [0.0, 0.0, 0.0],
+#     [1.0, 0.0, 0.0],
+#     [1.0, 2.0, 0.0]
+# ]), 0.9, np.array([1/3, 1/3, 1/3])))
 
 # print(code.pageRankPower(np.array([
 #     [0.0, 0.0, 0.0],
 #     [1.0, 0.0, 0.0],
 #     [1.0, 2.0, 0.0]
 # ]), 0.9, np.array([0.8, 0.1, 0.1])))
-#
+
 # print(code.pageRankPower(np.array([
 #     [0.0, 0.0, 0.0],
 #     [1.0, 0.0, 0.0],
@@ -50,6 +50,10 @@ print(code.pageRankPower(np.array([
 
 #print(f"\n{14//12}")
 
+
+
+
+print(AdjMat)
 
 
 
